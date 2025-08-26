@@ -25,7 +25,7 @@ export default function SubmitPromptDialog({ open, onClose }: { open: boolean; o
   async function submit() {
     if (!user) { setError('Please sign in first.'); return }
     setLoading(true); setError(null)
-    const { error } = await supabase.from('prompts').insert<Database['public']['Tables']['prompts']['Insert']>({
+    const { error } = await supabase.from('prompts').insert({
       title: title.trim(),
       body: body.trim(),
       type,

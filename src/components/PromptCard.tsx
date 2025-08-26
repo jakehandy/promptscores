@@ -45,7 +45,7 @@ export default function PromptCard({ prompt, initiallyVoted, onVoteChange }: {
       } else {
         const { error } = await supabase
           .from('prompt_votes')
-          .insert<Database['public']['Tables']['prompt_votes']['Insert']>({ prompt_id: prompt.id, user_id: user.id })
+          .insert({ prompt_id: prompt.id, user_id: user.id })
         if (error) throw error
         setVoted(true)
         setCount(c => c + 1)

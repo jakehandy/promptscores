@@ -71,7 +71,7 @@ export default function Account() {
       })
       const { error } = await supabase
         .from('prompts')
-        .update<Database['public']['Tables']['prompts']['Update']>({ title: p.title.trim(), body: p.body.trim(), type: p.type, tags: p.tags ?? [] })
+        .update({ title: p.title.trim(), body: p.body.trim(), type: p.type, tags: p.tags ?? [] })
         .eq('id', p.id)
         .eq('user_id', userId)
       if (error) {
