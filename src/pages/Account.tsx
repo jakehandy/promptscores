@@ -61,18 +61,20 @@ export default function Account() {
     async function loadProfile() {
       if (!user) { setProfileName(''); setProfileCreatedAt(null); return }
       setProfileLoading(true)
-      const { data, error } = await supabase
+      const res = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
         .maybeSingle()
       if (!active) return
+      const error = (res as any).error as any
       if (error) {
         // eslint-disable-next-line no-console
         console.error(error)
       }
-      setProfileName(data?.display_name ?? '')
-      setProfileCreatedAt(data?.created_at ?? null)
+      const row = (res as any).data as Database['public']['Tables']['profiles']['Row'] | null
+      setProfileName(row?.display_name ?? '')
+      setProfileCreatedAt(row?.created_at ?? null)
       setProfileLoading(false)
     }
     loadProfile()
@@ -83,7 +85,7 @@ export default function Account() {
     if (!user) return
     setProfileSaving(true); setProfileError(null); setProfileSuccess(null)
     const value = profileName.trim()
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('profiles')
       .update({ display_name: value || null })
       .eq('id', user.id)
