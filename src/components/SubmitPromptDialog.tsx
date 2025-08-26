@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { supabase, PROMPT_TYPES, type PromptType } from '../lib/supabase'
+import type { Database } from '../lib/database.types'
 import { useAuth } from '../lib/useAuth'
 import TagInput from './TagInput'
 
@@ -24,7 +25,7 @@ export default function SubmitPromptDialog({ open, onClose }: { open: boolean; o
   async function submit() {
     if (!user) { setError('Please sign in first.'); return }
     setLoading(true); setError(null)
-    const { error } = await supabase.from('prompts').insert({
+    const { error } = await supabase.from('prompts').insert<Database['public']['Tables']['prompts']['Insert']>({
       title: title.trim(),
       body: body.trim(),
       type,

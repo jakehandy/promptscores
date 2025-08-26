@@ -31,7 +31,8 @@ export default function Account() {
         console.error(error)
         setMyPrompts([])
       } else {
-        setMyPrompts((data ?? []).map(row => ({
+        const typedRows = (data ?? []) as Database['public']['Tables']['prompts']['Row'][]
+        setMyPrompts(typedRows.map(row => ({
           ...row,
           type: (row.type === 'Chat Setup' ? 'Learning' : row.type) as any,
           tags: row.tags ?? [],
@@ -56,6 +57,7 @@ export default function Account() {
   if (loading) return <div className="container"><div className="loading">Loading…</div></div>
 
   if (user) {
+    const userId = user.id
 
     async function savePrompt(idx: number) {
       if (!myPrompts) return
@@ -69,9 +71,9 @@ export default function Account() {
       })
       const { error } = await supabase
         .from('prompts')
-        .update({ title: p.title.trim(), body: p.body.trim(), type: p.type, tags: p.tags ?? [] })
+        .update<Database['public']['Tables']['prompts']['Update']>({ title: p.title.trim(), body: p.body.trim(), type: p.type, tags: p.tags ?? [] })
         .eq('id', p.id)
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
       if (error) {
         setMyPrompts(list => {
           if (!list) return list

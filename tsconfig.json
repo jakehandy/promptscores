@@ -18,6 +18,6 @@
       "@pages/*": ["src/pages/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "vite-env.d.ts"]
 }
 

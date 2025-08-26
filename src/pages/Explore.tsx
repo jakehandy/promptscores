@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Fuse from 'fuse.js'
 import { supabase, PROMPT_TYPES, type PromptType } from '../lib/supabase'
+import type { Database } from '../lib/database.types'
 import { useAuth } from '../lib/useAuth'
 import SearchBar from '../components/SearchBar'
 import FilterChips from '../components/FilterChips'
@@ -31,8 +32,11 @@ export default function Explore() {
       }
       let base: PromptWithVoted[] = (rows ?? []) as any
       if (!base?.length) {
-        const { data: rows2 } = await supabase.from('prompts').select('*')
-        base = (rows2 ?? []).map(r => ({ ...r, vote_count: 0 })) as any
+        const { data: rows2 } = await supabase
+          .from('prompts')
+          .select('*')
+        const typedRows2 = (rows2 ?? []) as Database['public']['Tables']['prompts']['Row'][]
+        base = typedRows2.map(r => ({ ...r, vote_count: 0 })) as any
       }
       // Mark votes by current user
       if (user) {
@@ -40,7 +44,8 @@ export default function Explore() {
           .from('prompt_votes')
           .select('prompt_id')
           .eq('user_id', user.id)
-        const set = new Set((votes ?? []).map(v => v.prompt_id))
+        const typedVotes = (votes ?? []) as Pick<Database['public']['Tables']['prompt_votes']['Row'], 'prompt_id'>[]
+        const set = new Set(typedVotes.map(v => v.prompt_id))
         base = base.map(p => ({ ...p, voted: set.has(p.id) }))
       }
       if (mounted) setPrompts(base)

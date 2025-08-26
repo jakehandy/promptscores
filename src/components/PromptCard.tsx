@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import type { Database } from '../lib/database.types'
 import { useAuth } from '../lib/useAuth'
 
 export type PromptRow = {
@@ -42,7 +43,9 @@ export default function PromptCard({ prompt, initiallyVoted, onVoteChange }: {
         setCount(c => c - 1)
         onVoteChange?.(-1, false)
       } else {
-        const { error } = await supabase.from('prompt_votes').insert({ prompt_id: prompt.id, user_id: user.id })
+        const { error } = await supabase
+          .from('prompt_votes')
+          .insert<Database['public']['Tables']['prompt_votes']['Insert']>({ prompt_id: prompt.id, user_id: user.id })
         if (error) throw error
         setVoted(true)
         setCount(c => c + 1)
