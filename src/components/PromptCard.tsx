@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import type { Database } from '../lib/database.types'
 import { useAuth } from '../lib/useAuth'
@@ -12,6 +13,7 @@ export type PromptRow = {
   user_id: string
   created_at?: string
   vote_count?: number
+  author_display_name?: string | null
 }
 
 export default function PromptCard({ prompt, initiallyVoted, onVoteChange }: {
@@ -95,6 +97,14 @@ export default function PromptCard({ prompt, initiallyVoted, onVoteChange }: {
       <h3 className="title">{prompt.title}</h3>
       <pre className="body" title={prompt.body}>{prompt.body}</pre>
       {/* Tags intentionally hidden from display; still used for search */}
+      <Link
+        className="author-link"
+        to={`/profile/${prompt.user_id}`}
+        title={prompt.author_display_name ? `View ${prompt.author_display_name}'s profile` : 'View profile'}
+        aria-label="View author profile"
+      >
+        {prompt.author_display_name ?? 'View profile'}
+      </Link>
       <button className="copy-btn" onClick={copyPrompt} aria-live="polite" aria-label={copied ? 'Copied' : 'Copy prompt'} title={copied ? 'Copied!' : 'Copy full prompt'}>
         {copied ? (
           // check icon

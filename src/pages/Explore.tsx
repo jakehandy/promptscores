@@ -14,6 +14,7 @@ export default function Explore() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
+  const [transitioning, setTransitioning] = useState(false)
   const [prompts, setPrompts] = useState<PromptWithVoted[]>([])
   const [query, setQuery] = useState('')
   const [typeFilter, setTypeFilter] = useState<PromptType | 'All'>('All')
@@ -48,12 +49,26 @@ export default function Explore() {
         const set = new Set(typedVotes.map(v => v.prompt_id))
         base = base.map(p => ({ ...p, voted: set.has(p.id) }))
       }
+      // Normalize legacy types for UI display/filters
+      base = base.map(p => ({
+        ...p,
+        type: p.type === 'System Prompt' ? 'Global Instruction' : (p.type === 'Chat Setup' ? 'Learning' : p.type),
+      }))
       if (mounted) setPrompts(base)
       setLoading(false)
     }
     load()
     return () => { mounted = false }
   }, [user])
+
+  // Smoothly fade skeletons out and cards in
+  useEffect(() => {
+    if (!loading) {
+      setTransitioning(true)
+      const id = setTimeout(() => setTransitioning(false), 220)
+      return () => clearTimeout(id)
+    }
+  }, [loading])
 
   const fuse = useMemo(() => new Fuse(prompts, {
     includeScore: true,
@@ -91,10 +106,22 @@ export default function Explore() {
           <FilterChips value={typeFilter} onChange={setTypeFilter} />
         </div>
       </div>
-      {loading ? (
-        <div className="loading">Loading…</div>
-      ) : (
-        <div className="grid">
+      <div className={`fade-grid ${!loading && !transitioning ? 'ready' : ''}`}>
+        {(loading || transitioning) && (
+          <div className="grid" aria-hidden>
+            {Array.from({ length: 8 }).map((_, i) => (
+              <article key={i} className="card">
+                <div className="card-top">
+                  <div className="skeleton skeleton-badge" style={{ width: 90, height: 22, borderRadius: 999 }} />
+                  <div className="skeleton skeleton-chip" style={{ width: 54, height: 26, borderRadius: 999 }} />
+                </div>
+                <div className="skeleton skeleton-title" style={{ width: '70%', height: 20, borderRadius: 8 }} />
+                <div className="skeleton skeleton-body" style={{ width: '100%', height: 120, borderRadius: 10 }} />
+              </article>
+            ))}
+          </div>
+        )}
+        <div className="grid real">
           {filtered.map(p => (
             <PromptCard
               key={p.id}
@@ -106,7 +133,7 @@ export default function Explore() {
               }}
             />
           ))}
-          {!filtered.length && (
+          {!filtered.length && !loading && !transitioning && (
             <div className="empty">
               <p>No prompts match your search.</p>
               {!user && (
@@ -115,7 +142,7 @@ export default function Explore() {
             </div>
           )}
         </div>
-      )}
+      </div>
     </section>
   )
 }

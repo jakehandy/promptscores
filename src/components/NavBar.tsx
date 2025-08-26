@@ -23,7 +23,10 @@ export default function NavBar() {
             Submit Prompt
           </button>
           {user ? (
-            <Link className="btn ghost" to="/account">Account</Link>
+            <>
+              <Link className="btn ghost" to={`/profile/${user.id}`}>My Profile</Link>
+              <Link className="btn ghost" to="/account">Account</Link>
+            </>
           ) : (
             <button className="btn ghost" onClick={() => navigate('/account')}>Sign In</button>
           )}

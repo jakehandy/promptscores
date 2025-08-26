@@ -12,7 +12,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const supabase: SupabaseClient<Database, 'public'> = createClient<Database, 'public'>(supabaseUrl, supabaseAnonKey)
 
 export const PROMPT_TYPES = [
-  'System Prompt',
+  'Global Instruction',
   'Learning',
   'Persona',
   'Tool Setup',

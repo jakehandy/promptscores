@@ -105,7 +105,18 @@ export interface Database {
     }
     Views: {
       prompts_with_counts: {
-        Row: Database["public"]["Tables"]["prompts"]["Row"] & { vote_count: number }
+        Row: Database["public"]["Tables"]["prompts"]["Row"] & { vote_count: number; author_display_name: string | null }
+      }
+      profile_metrics: {
+        Row: {
+          user_id: string
+          prompts_created: number
+          votes_received: number
+          votes_given: number
+          prompts_percentile: number
+          votes_received_percentile: number
+          votes_given_percentile: number
+        }
       }
     }
     Functions: {}

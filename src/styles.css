@@ -84,6 +84,22 @@ a{color:inherit;text-decoration:none}
 .loading{padding:30px;text-align:center;color:color-mix(in srgb, var(--accent) 80%, white 20%)}
 .empty{text-align:center;color:var(--muted);padding:30px}
 
+/* Skeletons */
+.skeleton{position:relative;overflow:hidden;background:color-mix(in srgb, var(--bg) 70%, white 30%);border:1px dashed var(--border)}
+.skeleton:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);transform:translateX(-100%);animation:shimmer 1.2s infinite}
+.skeleton-title{margin:4px 0 6px}
+.skeleton-body{}
+.skeleton-badge{}
+.skeleton-chip{}
+@keyframes shimmer{to{transform:translateX(100%)}}
+
+/* Crossfade grid */
+.fade-grid{position:relative}
+.fade-grid .grid{transition:opacity .22s ease}
+.fade-grid .grid.real{position:relative;opacity:0}
+.fade-grid.ready .grid.real{opacity:1}
+.fade-grid.ready .grid[aria-hidden]{opacity:0}
+
 /* Theme toggle */
 .theme-toggle{display:inline-flex;align-items:center;gap:0}
 .theme-toggle.icon-only{width:36px;height:36px;justify-content:center;border-radius:999px;border:1px solid var(--border)}
@@ -93,5 +109,18 @@ a{color:inherit;text-decoration:none}
 .copy-btn{position:absolute;right:12px;bottom:12px;display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:999px;border:1px solid var(--border);background:color-mix(in srgb, var(--accent) 12%, transparent);color:color-mix(in srgb, var(--accent) 85%, white 15%);cursor:pointer;transition:transform .15s, background .15s}
 .copy-btn:hover{transform:translateY(-1px);background:color-mix(in srgb, var(--accent) 18%, transparent)}
 
+/* Author link on prompt cards */
+.author-link{position:absolute;left:12px;bottom:14px;font-size:12px;color:var(--muted);max-width:calc(100% - 64px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.author-link:hover{text-decoration:underline;color:color-mix(in srgb, var(--accent) 85%, white 15%)}
+
 @keyframes fade{from{opacity:0}to{opacity:1}}
 @keyframes pop{from{transform:translateY(8px);opacity:.7}to{transform:none;opacity:1}}
+
+/* Profile */
+.profile .profile-header{display:flex;align-items:center;gap:12px;margin:20px 0}
+.profile .profile-name{margin:0}
+.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:10px 0 20px}
+.stat{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px}
+.stat-label{font-size:12px;color:var(--muted)}
+.stat-value{font-size:18px;font-weight:700}
+.kpi{margin-top:2px;color:var(--muted);font-size:12px}
