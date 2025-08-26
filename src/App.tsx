@@ -12,7 +12,7 @@ export default function App() {
       </main>
       <footer className="footer">
         <div className="container footer-inner">
-          <span>© {new Date().getFullYear()} Prompt Scores</span>
+          <span>© {new Date().getFullYear()} <a href="https://jakehandy.com" target="_blank" rel="noreferrer">Jake Handy</a></span>
           <span className="footer-actions">
             <ThemeToggle />
           </span>

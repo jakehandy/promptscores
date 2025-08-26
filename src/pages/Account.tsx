@@ -5,6 +5,8 @@ import { supabase, PROMPT_TYPES, type PromptType } from '../lib/supabase'
 import TagInput from '../components/TagInput'
 import type { Database } from '../lib/database.types'
 
+type ProfileBasic = Pick<Database['public']['Tables']['profiles']['Row'], 'display_name' | 'created_at'>
+
 export default function Account() {
   const { user, loading, signIn, signUp, signOut } = useAuth()
   const [email, setEmail] = useState('')
@@ -65,14 +67,15 @@ export default function Account() {
         .from('profiles')
         .select('display_name, created_at')
         .eq('id', user.id)
+        .returns<ProfileBasic>()
         .single()
       if (!active) return
       if (error) {
         // eslint-disable-next-line no-console
         console.error(error)
       }
-      setProfileName((data?.display_name ?? '') as string)
-      setProfileCreatedAt((data?.created_at ?? null) as string | null)
+      setProfileName(data?.display_name ?? '')
+      setProfileCreatedAt(data?.created_at ?? null)
       setProfileLoading(false)
     }
     loadProfile()
@@ -85,7 +88,7 @@ export default function Account() {
     const value = profileName.trim()
     const { error } = await supabase
       .from('profiles')
-      .update({ display_name: value || null })
+      .update<Database['public']['Tables']['profiles']['Update']>({ display_name: value || null })
       .eq('id', user.id)
     setProfileSaving(false)
     if (error) { setProfileError(error.message); return }

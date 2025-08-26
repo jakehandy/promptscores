@@ -9,7 +9,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('Supabase URL/key missing. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.')
 }
 
-export const supabase: SupabaseClient<Database, 'public'> = createClient<Database, 'public'>(supabaseUrl, supabaseAnonKey)
+export const supabase: SupabaseClient<Database> = createClient<Database>(supabaseUrl, supabaseAnonKey)
 
 export const PROMPT_TYPES = [
   'Global Instruction',
