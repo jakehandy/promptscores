@@ -43,7 +43,7 @@ export default function PromptCard({ prompt, initiallyVoted, onVoteChange }: {
         setCount(c => c - 1)
         onVoteChange?.(-1, false)
       } else {
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('prompt_votes')
           .insert({ prompt_id: prompt.id, user_id: user.id })
         if (error) throw error

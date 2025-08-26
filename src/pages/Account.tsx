@@ -69,7 +69,7 @@ export default function Account() {
         copy[idx] = { ...copy[idx], _saving: true, _error: null, _saved: false }
         return copy
       })
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('prompts')
         .update({ title: p.title.trim(), body: p.body.trim(), type: p.type, tags: p.tags ?? [] })
         .eq('id', p.id)
