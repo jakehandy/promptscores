@@ -26,6 +26,7 @@ a{color:inherit;text-decoration:none}
 .logo{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.2px}
 .logo-icon{display:inline-flex;width:28px;height:28px;align-items:center;justify-content:center;color:var(--text)}
 .nav-actions{display:flex;gap:10px}
+.menu-toggle{display:none;align-items:center;justify-content:center;width:36px;height:36px;border:1px solid var(--border);background:transparent;color:var(--text);border-radius:10px;cursor:pointer}
 .btn{border:1px solid var(--border);background:transparent;color:var(--text);padding:8px 14px;border-radius:10px;cursor:pointer;transition:all .2s}
 .btn:hover{transform:translateY(-1px);border-color:var(--chip-active)}
 .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#05130b;border:none}
@@ -132,3 +133,36 @@ a{color:inherit;text-decoration:none}
 .stat-label{font-size:12px;color:var(--muted)}
 .stat-value{font-size:18px;font-weight:700}
 .kpi{margin-top:2px;color:var(--muted);font-size:12px}
+
+/* App layout to keep footer at bottom and prevent overlap */
+.app{min-height:100vh;display:flex;flex-direction:column}
+.app > main{flex:1 0 auto}
+.footer{flex-shrink:0}
+
+/* Mobile menu overlay */
+.mobile-menu-backdrop{position:fixed;inset:0;background:rgba(8,12,28,1);backdrop-filter:none;display:flex;justify-content:flex-end;z-index:9999}
+.mobile-menu{position:relative;width:100%;height:100%;max-width:none;background:var(--panel);border-left:1px solid var(--border);padding:16px;display:flex;flex-direction:column;gap:12px;transform:translateX(100%);animation:menu-in .22s ease forwards}
+.mobile-menu.closing{animation:menu-out .22s ease forwards}
+.mobile-menu-backdrop.closing{animation:fade-out .22s ease forwards}
+.menu-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.menu-list{display:flex;flex-direction:column;gap:10px}
+.mobile-close{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border:1px solid var(--border);background:transparent;color:var(--text);border-radius:10px;cursor:pointer}
+@keyframes menu-in{to{transform:translateX(0)}}
+@keyframes menu-out{to{transform:translateX(100%)}}
+@keyframes fade-out{to{opacity:0}}
+
+/* Account display-name responsive row */
+.display-name-row{align-items:flex-start}
+.display-name-controls{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
+.display-name-controls input{min-width:0}
+
+/* Responsive adjustments */
+@media (max-width: 640px){
+  .nav-actions{display:none}
+  .menu-toggle{display:inline-flex}
+  .hero{padding:28px 0 12px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+  .footer .footer-inner{height:56px}
+  .display-name-row{flex-direction:column;align-items:stretch}
+  .display-name-controls{width:100%}
+}

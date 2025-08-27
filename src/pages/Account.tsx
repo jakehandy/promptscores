@@ -177,9 +177,9 @@ export default function Account() {
           <div className="row"><span className="muted">User ID</span><span className="mono">{user.id}</span></div>
           <div className="row"><span className="muted">Email</span><span>{user.email}</span></div>
           {profileError && !isCooldownError && <p className="error">{profileError}</p>}
-          <div className="row" style={{ alignItems: 'center' }}>
+          <div className="row display-name-row">
             <span className="muted">Display Name</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, maxWidth: '70%' }}>
+            <div className="display-name-controls">
               <input
                 value={profileName}
                 disabled={profileLoading}
