@@ -14,16 +14,19 @@ export interface Database {
           id: string
           created_at: string | null
           display_name: string | null
+          display_name_last_changed_at: string | null
         }
         Insert: {
           id: string
           created_at?: string | null
           display_name?: string | null
+          display_name_last_changed_at?: string | null
         }
         Update: {
           id?: string
           created_at?: string | null
           display_name?: string | null
+          display_name_last_changed_at?: string | null
         }
         Relationships: [
           {

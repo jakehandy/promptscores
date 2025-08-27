@@ -38,6 +38,7 @@ a{color:inherit;text-decoration:none}
 
 .hero{text-align:center;padding:40px 0 20px}
 .muted{color:var(--muted)}
+.muted-danger{color:color-mix(in srgb, var(--danger) 80%, white 20%)}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
 
 .searchbar{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:12px;max-width:700px;margin:12px auto 10px}
@@ -57,9 +58,12 @@ a{color:inherit;text-decoration:none}
 .card .body{white-space:pre-wrap;background:color-mix(in srgb, var(--bg) 70%, white 30%);
   border:1px dashed var(--border);padding:10px;border-radius:10px;max-height:180px;overflow:auto}
 .card-top{display:flex;justify-content:space-between;align-items:center}
-.vote{display:flex;align-items:center;gap:6px;background:color-mix(in srgb, var(--accent) 15%, transparent);border:1px solid var(--border);border-radius:999px;color:color-mix(in srgb, var(--accent) 85%, white 15%);padding:4px 8px;cursor:pointer}
+.vote{display:flex;align-items:center;gap:6px;background:color-mix(in srgb, var(--accent) 15%, transparent);border:1px solid var(--border);border-radius:999px;color:color-mix(in srgb, var(--accent) 85%, white 15%);padding:4px 8px;cursor:pointer;transition:transform .15s, background .15s}
+.vote:hover{transform:translateY(-1px);background:color-mix(in srgb, var(--accent) 18%, transparent)}
 .vote.active{background:color-mix(in srgb, var(--accent2) 22%, transparent)}
-.thumb{filter:grayscale(.3)}
+.vote.active:hover{background:color-mix(in srgb, var(--accent2) 26%, transparent)}
+.thumb{display:inline-flex;align-items:center;filter:none;color:inherit}
+.thumb.animate{animation:thumb-pop .24s ease-out}
 .tag-list{display:flex;flex-wrap:wrap;gap:6px}
 .tag{background:color-mix(in srgb, var(--accent) 16%, transparent);border:1px solid var(--border);border-radius:999px;padding:4px 8px;color:color-mix(in srgb, var(--accent) 85%, white 10%)}
 
@@ -77,6 +81,8 @@ a{color:inherit;text-decoration:none}
 .tag-input .x{background:transparent;border:none;color:var(--muted);cursor:pointer}
 
 .row{display:flex;justify-content:space-between;align-items:center;padding:8px 0}
+/* Ensure small prompt titles inside account mini cards match muted color */
+.card .row strong.muted{color:var(--muted);font-weight:700}
 .form{display:flex;flex-direction:column;gap:12px}
 .link{background:none;border:none;color:#c7d2fe;cursor:pointer}
 .switch{margin-top:10px}
@@ -115,6 +121,8 @@ a{color:inherit;text-decoration:none}
 
 @keyframes fade{from{opacity:0}to{opacity:1}}
 @keyframes pop{from{transform:translateY(8px);opacity:.7}to{transform:none;opacity:1}}
+
+@keyframes thumb-pop{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-1px) scale(1.08)}100%{transform:translateY(0) scale(1)}}
 
 /* Profile */
 .profile .profile-header{display:flex;align-items:center;gap:12px;margin:20px 0}

@@ -19,6 +19,7 @@ export default function Account() {
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null)
   const [profileName, setProfileName] = useState('')
   const [profileCreatedAt, setProfileCreatedAt] = useState<string | null>(null)
+  const [profileLastChangedAt, setProfileLastChangedAt] = useState<string | null>(null)
   const [profileLoading, setProfileLoading] = useState(false)
   const [profileSaving, setProfileSaving] = useState(false)
   const [profileError, setProfileError] = useState<string | null>(null)
@@ -75,6 +76,9 @@ export default function Account() {
       const row = (res as any).data as Database['public']['Tables']['profiles']['Row'] | null
       setProfileName(row?.display_name ?? '')
       setProfileCreatedAt(row?.created_at ?? null)
+      // Used to optionally reflect cooldown in UI if needed
+      // (DB trigger enforces the 30-day rule regardless)
+      setProfileLastChangedAt((row as any)?.display_name_last_changed_at ?? null)
       setProfileLoading(false)
     }
     loadProfile()
@@ -113,6 +117,7 @@ export default function Account() {
 
   if (user) {
     const userId = user.id
+    const isCooldownError = !!(profileError && /only change your display name every 30 days/i.test(profileError))
 
     async function savePrompt(idx: number) {
       if (!myPrompts) return
@@ -171,33 +176,42 @@ export default function Account() {
         <div className="card">
           <div className="row"><span className="muted">User ID</span><span className="mono">{user.id}</span></div>
           <div className="row"><span className="muted">Email</span><span>{user.email}</span></div>
-        </div>
-        <button className="btn" style={{ marginTop: 16 }} onClick={() => signOut()}>Sign out</button>
-
-        <h2 style={{ marginTop: 24 }}>Profile</h2>
-        <div className="card">
-          {profileError && <p className="error">{profileError}</p>}
-          <label className="field">
-            <span>Display name</span>
-            <input
-              value={profileName}
-              disabled={profileLoading}
-              onChange={e => setProfileName(e.target.value)}
-              placeholder={user.email ?? 'Your public name'}
-            />
-          </label>
-          <div className="row" style={{ justifyContent: 'space-between' }}>
-            <span className="muted" style={{ fontSize: 12 }}>
-              {profileCreatedAt ? `Profile created ${new Date(profileCreatedAt).toLocaleDateString()}` : ''}
-            </span>
-            <div>
-              {profileSuccess && <span className="muted" style={{ marginRight: 10 }}>{profileSuccess}</span>}
+          {profileError && !isCooldownError && <p className="error">{profileError}</p>}
+          <div className="row" style={{ alignItems: 'center' }}>
+            <span className="muted">Display Name</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, maxWidth: '70%' }}>
+              <input
+                value={profileName}
+                disabled={profileLoading}
+                onChange={e => setProfileName(e.target.value)}
+                placeholder={user.email ?? 'Your public name'}
+                style={{
+                  flex: 1,
+                  background: 'color-mix(in srgb, var(--bg) 80%, white 20%)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 10,
+                  padding: 10,
+                  color: 'var(--text)'
+                }}
+              />
+              {profileSuccess && <span className="muted" style={{ marginRight: 4 }}>{profileSuccess}</span>}
               <button className="btn primary" onClick={saveDisplayName} disabled={profileSaving}>
                 {profileSaving ? 'Saving…' : 'Save'}
               </button>
             </div>
           </div>
+          {isCooldownError && (
+            <div className="row" style={{ justifyContent: 'flex-start', paddingTop: 0 }}>
+              <span className="muted-danger" style={{ fontSize: 12 }}>{profileError}</span>
+            </div>
+          )}
+          <div className="row" style={{ justifyContent: 'flex-start', paddingTop: 0 }}>
+            <span className="muted" style={{ fontSize: 12 }}>
+              {profileCreatedAt ? `Profile created ${new Date(profileCreatedAt).toLocaleDateString()}` : ''}
+            </span>
+          </div>
         </div>
+        <button className="btn" style={{ marginTop: 16 }} onClick={() => signOut()}>Sign out</button>
 
         <h2 style={{ marginTop: 24 }}>My Prompts</h2>
         {myPrompts === null ? (
@@ -218,7 +232,7 @@ export default function Account() {
                   {items.map(({ p, idx }) => (
                     <button key={p.id} className="card" style={{ textAlign: 'left' }} onClick={() => setSelectedIdx(idx)}>
                       <div className="row" style={{ alignItems: 'center' }}>
-                        <strong style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>{p.title || '(Untitled)'}</strong>
+                        <strong className="muted" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>{p.title || '(Untitled)'}</strong>
                         <span className="muted" style={{ fontSize: 12 }}>{p.created_at ? new Date(p.created_at).toLocaleString() : ''}</span>
                       </div>
                       <div className="row" style={{ alignItems: 'center' }}>

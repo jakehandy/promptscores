@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { ThumbsUp } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import type { Database } from '../lib/database.types'
@@ -26,6 +27,7 @@ export default function PromptCard({ prompt, initiallyVoted, onVoteChange }: {
   const [count, setCount] = useState(prompt.vote_count ?? 0)
   const [pending, setPending] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [isThumbAnimating, setIsThumbAnimating] = useState(false)
 
   const tags = useMemo(() => (prompt.tags ?? []), [prompt.tags])
 
@@ -61,6 +63,13 @@ export default function PromptCard({ prompt, initiallyVoted, onVoteChange }: {
     }
   }
 
+  function handleVoteClick() {
+    if (pending || !user) return
+    setIsThumbAnimating(true)
+    setTimeout(() => setIsThumbAnimating(false), 240)
+    void toggleVote()
+  }
+
   async function copyPrompt() {
     try {
       const text = prompt.body
@@ -89,8 +98,10 @@ export default function PromptCard({ prompt, initiallyVoted, onVoteChange }: {
     <article className="card has-copy">
       <div className="card-top">
         <div className="type">{prompt.type === 'Chat Setup' ? 'Learning' : prompt.type}</div>
-        <button className={`vote ${voted ? 'active' : ''}`} onClick={toggleVote} disabled={pending || !user} aria-label="Toggle vote">
-          <span className="thumb">👍</span>
+        <button className={`vote ${voted ? 'active' : ''}`} onClick={handleVoteClick} disabled={pending || !user} aria-label="Toggle vote">
+          <span className={`thumb ${isThumbAnimating ? 'animate' : ''}`} aria-hidden>
+            <ThumbsUp size={16} strokeWidth={2} />
+          </span>
           <span>{count}</span>
         </button>
       </div>

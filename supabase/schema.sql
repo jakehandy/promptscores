@@ -16,6 +16,49 @@ create policy "Users can insert their profile" on public.profiles for insert wit
 drop policy if exists "Users can update own profile" on public.profiles;
 create policy "Users can update own profile" on public.profiles for update using (auth.uid() = id);
 
+-- Ensure display_name uniqueness (case-insensitive) and track last change timestamp
+alter table public.profiles
+  add column if not exists display_name_last_changed_at timestamp with time zone default now();
+
+-- Unique index on lower(display_name), allow multiple NULLs
+create unique index if not exists profiles_display_name_unique
+  on public.profiles (lower(display_name))
+  where display_name is not null;
+
+-- Enforce 30-day cooldown between display_name changes and update last_changed_at
+create or replace function public.enforce_display_name_constraints()
+returns trigger
+language plpgsql
+security definer
+as $$
+begin
+  if (coalesce(new.display_name, '') is distinct from coalesce(old.display_name, '')) then
+    -- Prevent changes if within 30 days of last change
+    if old.display_name_last_changed_at is not null
+       and (now() - old.display_name_last_changed_at) < interval '30 days' then
+      raise exception using message = 'You can only change your display name every 30 days. '
+        || 'Try again on ' || to_char(old.display_name_last_changed_at + interval '30 days', 'YYYY-MM-DD');
+    end if;
+
+    -- Optionally provide a nicer message for uniqueness before hitting the index
+    if new.display_name is not null and exists (
+      select 1 from public.profiles p
+      where p.id <> old.id and lower(p.display_name) = lower(new.display_name)
+    ) then
+      raise exception using message = 'That display name is already taken.';
+    end if;
+
+    new.display_name_last_changed_at := now();
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists trg_enforce_display_name_constraints on public.profiles;
+create trigger trg_enforce_display_name_constraints
+before update on public.profiles
+for each row execute function public.enforce_display_name_constraints();
+
 -- Automatically create a profile for new auth users
 create or replace function public.handle_new_user()
 returns trigger
@@ -23,13 +66,22 @@ language plpgsql
 security definer
 as $$
 begin
-  insert into public.profiles (id, display_name)
-  values (
-    new.id,
-    coalesce((new.raw_user_meta_data ->> 'display_name'), new.email)
-  )
-  on conflict (id)
-  do nothing;
+  begin
+    insert into public.profiles (id, display_name)
+    values (
+      new.id,
+      coalesce((new.raw_user_meta_data ->> 'display_name'), new.email)
+    )
+    on conflict (id)
+    do nothing;
+  exception when unique_violation then
+    -- Fallback: if desired display_name/email collides with another profile,
+    -- create the profile with a null display_name to avoid failing signup.
+    insert into public.profiles (id, display_name)
+    values (new.id, null)
+    on conflict (id)
+    do nothing;
+  end;
   return new;
 end;
 $$;
