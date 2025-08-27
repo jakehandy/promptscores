@@ -36,7 +36,7 @@ export default function Profile() {
         .eq('id', profileId)
         .maybeSingle()
       if (!active) return
-      setProfile(prof ?? { id: profileId, created_at: null, display_name: null })
+      setProfile(prof ?? { id: profileId, created_at: null, display_name: null, display_name_last_changed_at: null })
 
       // Load percentile metrics (view). If not present, silently ignore.
       try {
